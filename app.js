@@ -19,6 +19,11 @@ function testConnessione(indirizzo) {
     domanda()
   });
 
+  client.on('error', function(ex) {
+    console.log("Erorre nella connessione alla cassa: " + indirizzo + "\nPotrebbe essere l'indirizzo errato o la cassa potrebbe non essere in modalità FPU");
+    process.exit(1)
+  });
+
 /*   client.on('data', function (data) {
     console.log('Risposta dalla cassa: ' + data);
     //client.destroy(); // kill client after server's response
