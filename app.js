@@ -19,16 +19,16 @@ function testConnessione(indirizzo) {
     domanda()
   });
 
-  client.on('error', function(ex) {
+  client.on('error', function (ex) {
     console.log("Erorre nella connessione alla cassa: " + indirizzo + "\nPotrebbe essere l'indirizzo errato o la cassa potrebbe non essere in modalità FPU");
     process.exit(1)
   });
 
-/*   client.on('data', function (data) {
-    console.log('Risposta dalla cassa: ' + data);
-    //client.destroy(); // kill client after server's response
-  });
- */
+  /*   client.on('data', function (data) {
+      console.log('Risposta dalla cassa: ' + data);
+      //client.destroy(); // kill client after server's response
+    });
+   */
 
   //autenticazione alla cassa
   function domanda() {
@@ -82,6 +82,28 @@ function testWeb(indirizzo) {
   }).on('error', (err) => {
     //console.error(err);
   }).end();
+}
+
+function indirizzoServer() {
+  const { networkInterfaces } = require('os');
+
+  const nets = networkInterfaces();
+  //const results = Object.create(null); // Or just '{}', an empty object
+  const results = {}
+
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        if (!results[name]) {
+          results[name] = [];
+        }
+        results[name].push(net.address);
+      }
+    }
+  }
+
+  return results
 }
 
 function main() {
@@ -141,4 +163,5 @@ function main() {
   console.log('Avvio scansione')
   evilscan.run();
 }
-main()
+//main()
+console.log(indirizzoServer())
