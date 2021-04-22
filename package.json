@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "evilscan": "^1.8.0",
-    "ip": "^1.1.5"
+    "evilscan": "^1.8.0"
   }
 }

@@ -88,17 +88,16 @@ function indirizzoServer() {
   const { networkInterfaces } = require('os');
 
   const nets = networkInterfaces();
-  //const results = Object.create(null); // Or just '{}', an empty object
-  const results = {}
+  const results = []
 
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
       // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
       if (net.family === 'IPv4' && !net.internal) {
-        if (!results[name]) {
-          results[name] = [];
-        }
-        results[name].push(net.address);
+/*         if (!results) {
+          results = [];
+        } */
+        results.push({ "dev": name, "ip": net.address });
       }
     }
   }
@@ -106,9 +105,7 @@ function indirizzoServer() {
   return results
 }
 
-function main() {
-  //libreria per ottenere indirizzo server
-  var ip = require('ip');
+function avviaScansione() {
   //evilscan libreria per scansione porte 
   const Evilscan = require('evilscan');
   //scompongo l'indiirzzo per ottenre l'indirizzo di rete
@@ -163,5 +160,15 @@ function main() {
   console.log('Avvio scansione')
   evilscan.run();
 }
-//main()
-console.log(indirizzoServer())
+
+async function main() {
+  var server = await indirizzoServer()
+
+  server.forEach(ip => {
+    console.log(ip.ip)
+  })
+
+  process.exit(0)
+}
+main()
+//console.log(indirizzoServer())
