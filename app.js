@@ -84,6 +84,7 @@ function testWeb(indirizzo) {
   }).end();
 }
 
+//funzione per ottenere gli indirizzi ip delle schede di rete del server
 function indirizzoServer() {
   const { networkInterfaces } = require('os');
 
@@ -105,11 +106,11 @@ function indirizzoServer() {
   return results
 }
 
-function avviaScansione() {
+function avviaScansione(ip) {
   //evilscan libreria per scansione porte 
   const Evilscan = require('evilscan');
   //scompongo l'indiirzzo per ottenre l'indirizzo di rete
-  const indirizzo = ip.address().split('.', 3)
+  indirizzo = ip.split('.', 3)
   //array di indirizzi con le porte 9100 e 80 aperte
   var indirizzi = []
 
@@ -165,10 +166,11 @@ async function main() {
   var server = await indirizzoServer()
 
   server.forEach(ip => {
-    console.log(ip.ip)
+    //console.log(ip.ip)
+    avviaScansione(ip.ip)
   })
 
-  process.exit(0)
+  //process.exit(0)
 }
 main()
 //console.log(indirizzoServer())
