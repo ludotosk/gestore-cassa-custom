@@ -3,6 +3,8 @@ var readline = require('readline')
 var io = readline.createInterface(
   process.stdin, process.stdout);
 
+var stato = 'non eseguito'
+
 //variabili di controllo, quando hanno lo stesso valore sono state terminate tutte le scansione e si attiva l'inserimento manuale
 var scansioni = 0
 var terminate = 0
@@ -16,15 +18,18 @@ var echo = 0
 //controllo che la cassa risponda
 function testEcho() {
   if (echo == 0) {
+    stato = 'Connession fallita'
     console.log("Connessione alla cassa fallita!\nControllare che la cassa sia in modalità FPU e che l'indirizzo sia corretto\nPremere il tasto x della cassa in modalità FPU per verificare l'indirizzo")
-    process.exit(1)
+    //process.exit(1)
   } else {
+    stato = 'Connesso alla cassa e autenticato'
     echo = 0
   }
 }
 
 //funzione per la connessione via socket alla cassa
 function testConnessione(indirizzo) {
+  stato = 'Test connessione in corso'
 
   var net = require('net')
 
@@ -43,8 +48,9 @@ function testConnessione(indirizzo) {
   });
 
   client.on('error', function (ex) {
+    stato = 'Errore nella socket'
     console.log("Erorre nella connessione alla cassa: " + indirizzo + "\nL'indirizzo potrebbe essere errato o la cassa potrebbe non essere in modalità FPU\nPremere il tasto x della cassa in modalità FPU per verificare l'indirizzo");
-    process.exit(1)
+    //process.exit(1)
   });
 
 /*   client.on('data', function (data) {
@@ -55,13 +61,14 @@ function testConnessione(indirizzo) {
 
   //autenticazione alla cassa
   function domanda() {
+    stato = 'Autenticazione in corso'
     io.question('Inserire il codice comparso sulla cassa lato cliente: ', (risposta) => {
       if (risposta == codice) {
         console.log('Autenticazione avvenuta!')
         client.write('""1%')
         client.write('"Benvenuti!"2%')
         setTimeout(testEcho, 1000)
-        stampaScontrino()
+        //stampaScontrino()
         //io.close()
       } else {
         console.log('Codice errato!\n')
@@ -72,7 +79,7 @@ function testConnessione(indirizzo) {
 
 
 
-  function stampaScontrino() {
+/*   function stampaScontrino() {
     io.question('Inserire prezzo articolo: ', (prezzo) => {
       io.question('Inserire reparto articolo: ', (rep) => {
         client.write(prezzo + 'H' + rep + 'R')
@@ -81,16 +88,16 @@ function testConnessione(indirizzo) {
             stampaScontrino()
           } else if (stampa == 'no') {
             client.write('1T')
-            process.exit(1)
+            //process.exit(1)
           } else {
             client.write('1T')
-            process.exit(1)
+            //process.exit(1)
           }
         })
       })
     })
 
-  }
+  } */
 
 }
 
@@ -98,6 +105,7 @@ function testConnessione(indirizzo) {
 function inserimentoManuale() {
   //controllo per usare l'inserimento manuale solo una volta
   if (scansioni == terminate) {
+    stato = 'Inserimento manuale'
     io.question("Vuoi inserire l'indirizzo manualmente? [sì|no]", (risposta) => {
       if (risposta == 'sì') {
         console.log("Con la cassa in modalità FPU premere il tasto x per leggere l'ip")
@@ -105,7 +113,7 @@ function inserimentoManuale() {
           testConnessione(res2)
         })
       } else if (risposta == 'no') {
-        process.exit(0)
+        //process.exit(0)
       } else {
         console.log("Risposta non valida!\nRispondere: 'sì' oppure 'no'")
         inserimentoManuale()
@@ -116,6 +124,7 @@ function inserimentoManuale() {
 
 //funzione per verificare che l'indirizzo trovato abbia il web server di custom
 function testWeb(indirizzo) {
+  stato = 'Test server web in corso'
   //codice per la request http preso dal sito di node
   const http = require('http');
 
@@ -214,9 +223,12 @@ async function main() {
       });
 
       console.log('Avvio scansione scheda ' + res.dev)
+      stato = 'Inizio scansione'
       evilscan.run();
     })
   }
 
 }
 main()
+
+module.exports = { stato, main }
