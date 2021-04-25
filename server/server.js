@@ -1,22 +1,22 @@
+//libreria per la gestione delle get e delle post
 const express = require('express')
-const cors = require('cors')
-const connessione = require('./connessione')
 
+//lancio express
 const app = express()
-
-// Avvio connessione cassa
-connessione.main()
 
 // Middleware
 app.use(express.json());
-app.use(cors());
 
-const scontrini = require('./routes/api/scontrini')
-const status = require('./routes/api/status')
+//javascript per la gestione delle pagine stato e scontrini
+const scontrini = require('./routes/scontrini')
+const status = require('./routes/status')
 
+//assegno una route agli script
 app.use('/scontrini', scontrini)
 app.use('/status', status)
 
+//porta del server
 const port = 5000;
 
+//lancio il server
 app.listen(port, () => console.log(`Server stated on port ${port}`));

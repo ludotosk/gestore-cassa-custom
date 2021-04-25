@@ -1,3 +1,4 @@
+//test comandi via terminale con connessione diretta via socket tcp alla cassa
 var readline = require('readline')
 var io = readline.createInterface(
     process.stdin, process.stdout);
