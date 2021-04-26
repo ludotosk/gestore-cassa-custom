@@ -1,3 +1,6 @@
+//modalità strict non permette l'utilizzo di variabili senza assegnazione
+"use strict";
+
 //importo express e lo script per la connessione
 const express = require('express');
 const connessione = require('../connessione')
@@ -23,7 +26,7 @@ router.post('/', async (req, res) => {
         res.status(201).send()
     } else if (indirizzo != undefined) {
         connessione.testConnessione(indirizzo)
-        res.status(201).send()
+        res.status(200).send()
     } else {
         res.status(400).send()
     }

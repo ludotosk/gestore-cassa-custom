@@ -1,3 +1,6 @@
+//modalità strict non permette l'utilizzo di variabili senza assegnazione
+"use strict";
+
 //libreria per gestione delle connessioni http
 const express = require('express');
 //importo script per la stampa su scontrino
@@ -13,8 +16,13 @@ router.get('/', (req, res) => {
 
 //gestore della post
 router.post('/', (req, res) => {
-    stampa.setBody(req.body)
-    res.status(201).send()
+    //controllo che ci sia la socket in stampa per procedere con la stampa
+    if (stampa.setSocket() == 0) {
+        stampa.setBody(req.body)
+        res.status(201).send()
+    } else {
+        res.status(400).send()
+    }
 })
 
 //esporto il modulo router al file server

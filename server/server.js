@@ -1,3 +1,6 @@
+//modalità strict non permette l'utilizzo di variabili senza assegnazione
+"use strict";
+
 //libreria per la gestione delle get e delle post
 const express = require('express')
 

@@ -1,11 +1,11 @@
+//modalità strict non permette l'utilizzo di variabili senza assegnazione
+"use strict";
+
 //libreria per le socket
 var net = require('net')
 
 //stato da mandare al web server
 var stato = 'Non eseguito'
-
-//variabile controllo connessione fallita
-var fail = 0
 
 //variabili di controllo, quando hanno lo stesso valore sono state terminate tutte le scansione e si attiva l'inserimento manuale
 var scansioni = 0
@@ -37,7 +37,6 @@ function testEcho() {
   if (echo == 0) {
     stato = 'Connession fallita - Chiusura connessione'
     console.log("Connessione alla cassa fallita!\nControllare che la cassa sia in modalità FPU e che l'indirizzo sia corretto\nPremere il tasto x della cassa in modalità FPU per verificare l'indirizzo")
-    fail = 1
   } else {
     stato = 'Connesso alla cassa eseguire autenticazione'
     echo = 0
@@ -46,23 +45,20 @@ function testEcho() {
 
 // autenticazione alla cassa via web
 async function autenticazioneWeb(codiceAut) {
-  if (fail == 0) {
-    stato = 'Autenticazione in corso'
-    if (codiceAut == codice) {
-      console.log('Autenticazione avvenuta!')
-      client.write('""1%')
-      client.write('"Benvenuti!"2%')
-      //setTimeout(testEcho, 1000)
-      stato = 'Connesso alla cassa e autenticato'
-      return 0
-    } else {
-      console.log(codiceAut)
-      console.log('Codice errato!\n')
-      stato = 'Codice Errato'
-      return 1
-    }
+  stato = 'Autenticazione in corso'
+  if (codiceAut == codice) {
+    console.log('Autenticazione avvenuta!')
+    client.write('""1%')
+    client.write('"Benvenuti!"2%')
+    //setTimeout(testEcho, 1000)
+    stato = 'Connesso alla cassa e autenticato'
+    return 0
+  } else {
+    console.log(codiceAut)
+    console.log('Codice errato!\n')
+    stato = 'Codice Errato'
+    return 1
   }
-  return 1
 }
 
 //funzione per la connessione via socket alla cassa se la cassa risponde vuol dire che tutto funziona
@@ -72,11 +68,12 @@ function testConnessione(indirizzo) {
 
   //connetto la socket alla cassa
   client.connect(9100, indirizzo, function () {
-    //echo = 0
+    //assegno 0 a echo perché in caso di risposta verrà cambiato con 1 e allora sarà avvenuta con successo la connessione
+    echo = 0
     client.write('"Codice collegamento"1%')
     client.write('"' + codice + '"2%')
     console.log(codice)
-    setTimeout(testEcho,1000)
+    setTimeout(testEcho, 1000)
   });
 
   //gestisco errori di connessione
@@ -87,6 +84,7 @@ function testConnessione(indirizzo) {
 
   //evento che gestisce le risposte alla socket
   client.on('data', function (data) {
+    //ho ottenuto una risposta dalla cassa allora la connessione ha avuto successo
     echo = 1
     //console.log('\nRisposta dalla cassa: ' + data);
   });
@@ -153,7 +151,7 @@ async function main() {
       //evilscan libreria per scansione porte 
       const Evilscan = require('evilscan');
       //scompongo l'indiirzzo per ottenre l'indirizzo di rete
-      indirizzo = res.ip.split('.', 3)
+      var indirizzo = res.ip.split('.', 3)
       //array di indirizzi con le porte 9100 e 80 aperte
       var indirizzi = []
 
