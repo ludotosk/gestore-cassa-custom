@@ -112,6 +112,7 @@ function testRisultatoScansione() {
   //controllo per usare l'inserimento manuale solo una volta
   if (scansioni == terminate) {
     stato = 'Inserimento manuale'
+    console.log(`Eseguire l'inserimento manuale`)
   }
 }
 
