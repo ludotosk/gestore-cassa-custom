@@ -1,20 +1,21 @@
 //modalità strict non permette l'utilizzo di variabili senza assegnazione
 "use strict";
 
+//libreria per gestione di sqlite3
+var sqlite3 = require('sqlite3').verbose();
+//mi serve usare il path per recuperare il file del database
+const path = require('path')
+const dbPath = path.resolve(__dirname, '../../../database/scatolino.db')
+//mi collego al db file
+let db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error(err.message);
+    }
+    console.log('Connessione al database')
+});
+
 //esporto il modulo router al file server
 module.exports = function (app, opts, done) {
-    //libreria per gestione di sqlite3
-    var sqlite3 = require('sqlite3').verbose();
-    //mi serve usare il path per recuperare il file del database
-    const path = require('path')
-    const dbPath = path.resolve(__dirname, '../../../database/scatolino.db')
-    //mi collego al db file
-    let db = new sqlite3.Database(dbPath, (err) => {
-        if (err) {
-            console.error(err.message);
-        }
-        console.log('Connessione al database')
-    });
 
     //gestore della post
     app.post('/', (req, res) => {
@@ -114,3 +115,5 @@ module.exports = function (app, opts, done) {
 
     done()
 }
+
+module.exports.db = db;

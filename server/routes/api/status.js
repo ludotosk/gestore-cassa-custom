@@ -1,10 +1,11 @@
 //modalità strict non permette l'utilizzo di variabili senza assegnazione
 "use strict";
 
+const connessione = require('../../servizi/connessione')
+const controllo = require('../../funzioniControllo')
+
 //con questo ritorno il router al server che mi ha importato lo script
 module.exports = function (app, opts, done) {
-    const connessione = require('../../servizi/connessione')
-    const controllo = require('../../funzioniControllo')
 
     //gestisco le get e ritorno lo stato della connessione
     app.get('/', (req, res) => {

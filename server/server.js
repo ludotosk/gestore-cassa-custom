@@ -14,6 +14,9 @@ const path = require('path')
 //script per la connessione alla cassa
 const connessione = require('./servizi/connessione')
 
+const dbModule = require('./routes/api/db')
+const db = dbModule.db
+
 //lancio lo script
 connessione.main()
 
@@ -25,8 +28,8 @@ app.register(fastifyStatic, {
 })
 
 app.register(require('./routes/api/db'), { prefix: '/api/db' })
-//app.register(require('./routes/api/scontrini'), { prefix: `/api/scontrini`})
-app.register(require('./routes/api/status'), { prefix: '/api/status'})
+app.register(require('./routes/api/scontrini'), { prefix: `/api/scontrini` })
+app.register(require('./routes/api/status'), { prefix: '/api/status' })
 
 
 // Start the server
@@ -38,16 +41,20 @@ app.listen(5000, '0.0.0.0', function (err, address) {
     console.log(`Server listening on ${address}`)
 })
 
-/* //funzione che chiude il server
+//funzione che chiude il server
 function handle() {
     console.info('SIGTERM or SIGINT signal received.');
     console.log('Closing http server.');
-    server.close(() => {
+    db.close(() => {
+            console.log('Chiusura database');
+        })
+    app.close(() => {
         console.log('Http server closed.');
     });
 }
 
 
+
 //gestisco il segnale di chiusura del server
 process.on('SIGTERM', handle);
-process.on('SIGINT', handle); */
+process.on('SIGINT', handle);

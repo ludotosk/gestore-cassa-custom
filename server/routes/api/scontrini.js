@@ -1,10 +1,11 @@
 //modalità strict non permette l'utilizzo di variabili senza assegnazione
 "use strict";
 
+//importo script per la stampa su scontrino
+const stampa = require('../../servizi/stampa')
+
 //esporto il modulo router al file server
 module.exports = function (app, opts, done) {
-    //importo script per la stampa su scontrino
-    const stampa = require('../../servizi/stampa')
 
     //gestore della post
     app.post('/', (req, res) => {
@@ -21,4 +22,5 @@ module.exports = function (app, opts, done) {
         }
     })
 
+    done()
 }
