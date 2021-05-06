@@ -30,6 +30,11 @@ function getStatus() {
   return stato
 }
 
+//imposto lo stato da fuori
+function setStatus(status) {
+  this.status = status;
+}
+
 //passa la socket creata qui agli altri script
 function getSocket() {
   return client
@@ -103,7 +108,7 @@ function testConnessione(indirizzo) {
     });
 
   } else {
-    stato = 'Inserire un indirizzo ip valido'
+    stato = 'Questo non è un indirizzo IP valido'
   }
 }
 
@@ -227,4 +232,4 @@ async function main() {
 }
 
 //module exports server a rendere disponibili ad altri js le due funzioni
-module.exports = { getStatus, autenticazioneWeb, testConnessione, getSocket, main }
+module.exports = { getStatus, autenticazioneWeb, testConnessione, getSocket, main, setStatus }

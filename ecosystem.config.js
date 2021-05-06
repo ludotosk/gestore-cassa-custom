@@ -1,10 +1,10 @@
 module.exports = {
   apps : [{
-    name : 'gestionale cassa custom',
+    name : 'cassa',
     script : './server/server.js',
     watch: ["server"],
     watch_delay : 1000,
-    ignore_watch : ["node_modules", "server/public", "server/db"],
+    ignore_watch : ["server/public"],
     //instances : "max",
     //exec_mode : "cluster"
   }],

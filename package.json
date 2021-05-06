@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/ludotosk/gestionale-cassa-custom#readme",
   "devDependencies": {
+    "faker": "^5.5.3",
     "nodemon": "^2.0.7"
   }
 }

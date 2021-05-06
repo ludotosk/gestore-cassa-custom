@@ -30,10 +30,11 @@ app.register(fastifyStatic, {
 app.register(require('./routes/api/db'), { prefix: '/api/db' })
 app.register(require('./routes/api/scontrini'), { prefix: `/api/scontrini` })
 app.register(require('./routes/api/status'), { prefix: '/api/status' })
-
+app.register(require('./routes/api/codice'), { prefix: '/api/codice' })
+app.register(require('./routes/api/indirizzo'), { prefix: '/api/indirizzo' })
 
 // Start the server
-app.listen(5000, '0.0.0.0', function (err, address) {
+app.listen(3000, '0.0.0.0', function (err, address) {
     if (err) {
         console.error(err)
         process.exit(1)
