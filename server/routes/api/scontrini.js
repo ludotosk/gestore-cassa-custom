@@ -19,6 +19,13 @@ const scontrinoOptions = {
 
 //esporto il modulo router al file server
 module.exports = function (app, opts, done) {
+    app.addHook("onRequest", async (request, reply) => {
+        try {
+          await request.jwtVerify()
+        } catch (err) {
+          reply.send(err)
+        }
+      })
 
     //gestore della post
     app.post('/', scontrinoOptions, (req, res) => {

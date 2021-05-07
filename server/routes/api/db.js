@@ -222,7 +222,14 @@ const optScontrino = {
 
 //esporto il modulo router al file server
 module.exports = function (app, opts, done) {
-
+    app.addHook("onRequest", async (request, reply) => {
+        try {
+          await request.jwtVerify()
+        } catch (err) {
+          reply.send(err)
+        }
+      })
+    
     //creo una post per tabella
     app.post('/prodotti', optProdotti, (req, res) => {
         var prodotto = req.body.prodotto;

@@ -35,6 +35,13 @@ const codiceOptions = {
 
 //con questo ritorno il router al server che mi ha importato lo script
 module.exports = function (app, opts, done) {
+    app.addHook("onRequest", async (request, reply) => {
+        try {
+          await request.jwtVerify()
+        } catch (err) {
+          reply.send(err)
+        }
+      })
 
     //gestisco le post
     app.post('/', codiceOptions, async (req, res) => {

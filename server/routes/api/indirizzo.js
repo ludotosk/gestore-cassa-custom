@@ -19,6 +19,13 @@ const indirizzoOptions = {
 
 //con questo ritorno il router al server che mi ha importato lo script
 module.exports = function (app, opts, done) {
+    app.addHook("onRequest", async (request, reply) => {
+        try {
+          await request.jwtVerify()
+        } catch (err) {
+          reply.send(err)
+        }
+      })
 
     app.post('/', indirizzoOptions, (req, res) => {
         //salvo il valore presente nel body
