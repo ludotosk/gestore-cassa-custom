@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 //metto l'url del server 
-const url = "api/status";
+const url = "status";
 
 class StatoService {
     //mi da lo stato del server

@@ -3,6 +3,18 @@
 
 //libreria per cifrare dati
 const crypto = require('crypto')
+//libreria lettura file
+const fs = require('fs')
+//api node per il percorso
+const path = require('path')
+//recupero la chiave pubblica
+const pathPub = path.resolve(__dirname, 'chiavi/rsa_4096_pub.pem')
+//recupero chiave privata
+const pathPriv = path.resolve(__dirname, 'chiavi/rsa_4096_priv.pem')
+//copio la chive pubblica in una costante
+const pub = fs.readFileSync(pathPub, 'utf8')
+//copio la chive privata in una costante
+const priv = fs.readFileSync(pathPriv, 'utf8')
 
 //controllo che l'indirizzo inserito sia un ip valido
 function isIP(indirizzo) {
@@ -46,18 +58,18 @@ function makeid(length) {
 }
 
 //cifratura dati con chiave pubblica
-function encrypt(toEncrypt, publicKey) {
+function encrypt(toEncrypt) {
     const buffer = Buffer.from(toEncrypt, 'utf8')
-    const encrypted = crypto.publicEncrypt(publicKey, buffer)
+    const encrypted = crypto.publicEncrypt(pub, buffer)
     return encrypted.toString('base64')
 }
 
 //decifratura con chiave privata
-function decrypt(toDecrypt, privateKey) {
+function decrypt(toDecrypt) {
     const buffer = Buffer.from(toDecrypt, 'base64')
     const decrypted = crypto.privateDecrypt(
         {
-            key: privateKey.toString(),
+            key: priv.toString(),
             passphrase: '',
         },
         buffer,
@@ -65,7 +77,7 @@ function decrypt(toDecrypt, privateKey) {
     return decrypted.toString('utf8')
 }
 
-//funzioni cifratura simmetrici
+//cifratura chiave simmetrica
 function encSim(text, key) {
     var iv = crypto.randomBytes(16);
     var cipher = crypto.createCipheriv('aes256', key, iv);
@@ -75,6 +87,7 @@ function encSim(text, key) {
     return ciphertext;
 }
 
+//decifratura chiave simmetrica
 function decSim(enc, key) {
     var components = enc.split(':');
     var iv_from_ciphertext = Buffer.from(components.shift(), 'hex');

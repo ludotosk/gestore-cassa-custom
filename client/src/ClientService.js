@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 //metto l'url del server 
-const url = "api/scontrini";
+const url = "scontrini";
 
 class ClientService {
     //funzione per l'invio dello scontrino
