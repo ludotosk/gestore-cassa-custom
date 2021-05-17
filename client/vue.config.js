@@ -8,7 +8,7 @@ module.exports = {
     devServer: {
         proxy: {
             '/api': {
-                target: 'http://192.168.1.122:5000/'
+                target: 'localhost:3000/'
             }
         }
     }

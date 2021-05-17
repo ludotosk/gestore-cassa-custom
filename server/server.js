@@ -19,14 +19,15 @@ connessione.main()
 // Middleware per le chiamate cross origin
 app.register(fastifyCors, {})
 
-app.register(require('./static'), { prefix: '/'})
+app.register(require('./static'), { prefix: '/' })
 app.register(require('./routes/db'), { prefix: '/db' })
 app.register(require('./routes/scontrini'), { prefix: `/scontrini` })
 app.register(require('./routes/status'), { prefix: '/status' })
-app.register(require('./routes/codice'), { prefix: '/codice' })
+//app.register(require('./routes/codiceCassa'), { prefix: '/codice' })
 app.register(require('./routes/indirizzo'), { prefix: '/indirizzo' })
 app.register(require('./routes/login'), { prefix: '/login' })
 app.register(require('./routes/pubkey'), { prefix: '/pubkey' })
+app.register(require('./routes/codiceLogin.js'), { prefix: '/codice' })
 
 // Start the server
 app.listen(3000, '0.0.0.0', function (err, address) {
