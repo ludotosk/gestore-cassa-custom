@@ -3,6 +3,8 @@
 
 //script con funzioni mie
 const controllo = require('../funzioniControllo')
+//importo script per la generazione del codice
+const codiceLogin = require('./codiceLogin')
 
 //libreria per la gestione degli utenti
 const jwt = require('jsonwebtoken');
@@ -23,15 +25,23 @@ module.exports = function (app, opts, done) {
 
     app.post('/', (req, res) => {
         // Mock user
-        const user = {
-            id: 1,
-            username: 'brad',
-            email: 'brad@gmail.com'
+        var code = req.body.codice;
+        console.log('Post login in arrivo, codice: ' + JSON.stringify(code))
+        if (code == codiceLogin.getCodice()) {
+            console.log('Effettuato login')
+            
+            // Utente finto necessario per generare un token
+            const ip = req.ip;
+            
+            jwt.sign({ ip }, 'chiaveacaso', (err, token) => {
+                //elimino il codice quando inviio il token per liberare lo schermo
+                //codiceLogin.deleteCode()
+                res.send({ token })
+            });
+        } else {
+            console.log('Tentato login')
+            res.code(400).send()
         }
-
-        jwt.sign({ user }, 'secretkey', (err, token) => {
-            res.send({ token })
-        });
     })
 
     done()

@@ -4,7 +4,9 @@
 //libreria per la gestione delle get e delle post
 const fastify = require('fastify')
 //lancio fastify
-const app = fastify()
+const app = fastify({
+    //logger: { level: 'trace' }
+})
 //libreria per le cross origin
 const fastifyCors = require("fastify-cors");
 //script per la connessione alla cassa
@@ -12,9 +14,13 @@ const connessione = require('./servizi/connessione')
 //prendo l'oggetto database per poterlo chiudere nella funzione di spegnimento
 const dbModule = require('./routes/db')
 const db = dbModule.db
+//importo funzione per cancellare il codice all'avvio e alla chiusura del server
+const login = require('./routes/codiceLogin')
 
 //lancio lo script
 connessione.main()
+//cancello il file codice in caso di spegnimento del server senza close
+login.deleteCode()
 
 // Middleware per le chiamate cross origin
 app.register(fastifyCors, {})
@@ -45,6 +51,7 @@ app.addHook('onClose', (instance, done) => {
         console.log('Chiusura database');
         done()
     })
+    login.deleteCode()
 })
 
 //funzione che chiude il server

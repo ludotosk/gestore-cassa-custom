@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import ClientService from "../ClientService";
+import ClientService from "../ScontrinoService";
 
 export default {
   name: "ComponenteScontrino",
