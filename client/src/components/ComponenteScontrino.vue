@@ -1,89 +1,198 @@
 <template>
-  <div>
-    <label for="inserisci-descrizione">Descrizione articolo: </label>
-    <input
-      type="text"
-      id="inserisci-descrizione"
-      v-model="descrizione"
-      placeholder="Facoltativa"
-    />
-    <br />
-    <label for="inserisci-quantita">Quantita: </label>
-    <input
-      type="text"
-      id="inserici-quantita"
-      v-model="quantita"
-      placeholder="Facoltativa"
-    />
-    <br />
-    <label for="inserisci-reparto">Reparto: </label>
-    <input
-      type="text"
-      id="inserisci-reparto"
-      v-model="reparto"
-      placeholder="Obbligatorio"
-    />
-    <br />
-    <label for="inserisci-prezzo">Prezzo: </label>
-    <input
-      type="text"
-      id="inserisci-prezzo"
-      v-model="prezzo"
-      placeholder="Facoltativo"
-    />
-    <br />
-    <label for="inserisci-pagamento">Pagamento: </label>
-    <input type="text" id="inserisci-pagamento" v-model="pagamento" />
-    <br>
-    <button v-on:click="aggiungiArticolo">Aggiungi articolo</button>
-    <button v-on:click="inviaScontrino">Invia</button>
+  <div class="h-screen">
+    <div
+      class="flex flex-col space-x-1 space-y-1 bg-white m-2 p-1 rounded shadow-md"
+    >
+      <div class="flex flex-row">
+        <label class="font-semibold mt-2.5">Art: </label>
+        <input
+          type="text"
+          placeholder="Descizione da tastiera"
+          class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+          v-model="descrizione_libera"
+        />
+        <label class="font-semibold mt-2.5">Rep: </label>
+        <input
+          type="text"
+          placeholder="Reparto da tastiera"
+          class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+          v-model="reparto_libero"
+        />
+      </div>
+      <div class="flex flex-row">
+        <label class="font-semibold mt-2.5">Qta: </label>
+        <input
+          type="text"
+          placeholder="Quantità da tastiera"
+          class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+          v-model="quantita_libera"
+        />
+        <label class="font-semibold mt-2.5">Unità: </label>
+        <input
+          type="text"
+          placeholder="Prezzo unità"
+          class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+          v-model="prezzo_libero"
+        />
+        <button
+          class="bg-blue-300 rounded p-1 m-1 hover:bg-blue-400"
+          @click.prevent="
+            aggiungiArticolo({
+              reparto: reparto_libero,
+              quantita: quantita_libera,
+              descrizione: descrizione_libera,
+              prezzo: prezzo_libero,
+            })
+          "
+        >
+          aggiungi
+        </button>
+      </div>
+    </div>
+    <!-- articoli auto generati -->
+    <div class="overflow-scroll lg:h-3/4">
+      <div
+        class="bg-white m-2 p-1 rounded shadow-md"
+        v-for="articolo in scontrino"
+        :key="articolo"
+      >
+        <div class="flex flex-col space-x-1 space-y-1">
+          <div class="flex flex-row">
+            <label class="font-semibold mt-2.5">Art: </label>
+            <input
+              type="text"
+              :placeholder="articolo.descrizione"
+              class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+              v-model="articolo.descrizione"
+            />
+            <button
+              class="bg-red-500 p-1 h-8 m-2 rounded hover:bg-red-600"
+              @click.prevent="
+                $store.commit('cancellaArticolo', scontrino.indexOf(articolo))
+              "
+            >
+              <img src="@/assets/trash-bin.svg" class="h-4" />
+            </button>
+          </div>
+          <div class="flex flex-row">
+            <label class="font-semibold mt-2.5">Qta: </label>
+            <input
+              type="text"
+              :placeholder="articolo.quantita"
+              class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+              v-model="articolo.quantita"
+            />
+            <label class="font-semibold mt-2.5">Unità: </label>
+            <input
+              type="text"
+              :placeholder="articolo.prezzo"
+              class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
+              v-model="articolo.prezzo"
+            />
+            <button
+              class="bg-blue-300 rounded p-1 m-1 hover:bg-blue-400"
+              @click.prevent="
+                aggiornaArticolo(scontrino.indexOf(articolo), {
+                  descrizione: articolo.descrizione,
+                  quantita: articolo.quantita,
+                  prezzo: articolo.prezzo,
+                  reparto: articolo.reparto,
+                })
+              "
+            >
+              aggiorna
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="flex flex-row lg:relative lg:bottom-0 fixed bottom-44 w-full bg-blue-50"
+    >
+      <button
+        class="w-full bg-red-500 rounded shadow m-1 mb-3 lg:h-12 hover:bg-red-600"
+        @click.prevent="cancellaScotrino"
+      >
+        Cancella scontrino
+      </button>
+      <button
+        class="w-full bg-green-500 rounded shadow m-1 mb-3 lg:h-12 hover:bg-green-600"
+        @click.prevent="$store.commit('setStampa', true)"
+      >
+        Stampa
+      </button>
+      <p
+        class="w-full bg-blue-500 rounded shadow m-1 mb-3 lg:h-12 text-center p-3"
+      >
+        Sub: {{ sub }}
+      </p>
+    </div>
   </div>
 </template>
 
 <script>
-import ClientService from "../ScontrinoService";
+import { mapGetters } from "vuex";
 
 export default {
-  name: "ComponenteScontrino",
-  data() {
-    return {
-      error: "",
-      quantita: "",
-      prezzo: "",
-      descrizione: "",
-      reparto: "",
-      pagamento: "",
-      scontrino: [],
-    };
-  },
+  name: "scontrino",
   methods: {
-    async aggiungiArticolo() {
-      var articolo = {};
-      if (this.reparto != "") {
-        articolo.reparto = this.reparto;
-        if (this.quantita != "") {
-          articolo.quantita = this.quantita;
+    aggiungiArticolo(data) {
+      if (
+        this.isNumeric(data.quantita) &
+        this.isNumeric(data.prezzo) &
+        this.isNumeric(data.reparto) &
+        this.isASCII(data.descrizione)
+      ) {
+        if (this.scontrino.length > 0) {
+          let aggiornato = false;
+          this.scontrino.forEach((el) => {
+            if (
+              (el.reparto == data.reparto) &
+              (el.descrizione == data.descrizione) &
+              (el.prezzo == data.prezzo)
+            ) {
+              data.quantita = el.quantita + data.quantita;
+              this.aggiornaArticolo(this.scontrino.indexOf(el), data);
+              aggiornato = true;
+            }
+          });
+          if (!aggiornato) {
+            this.$store.commit("aggiungiArticolo", data);
+          }
+        } else {
+          this.$store.commit("aggiungiArticolo", data);
         }
-        if (this.descrizione != "") {
-          articolo.descrizione = this.descrizione;
-        }
-        if (this.prezzo != "") {
-          articolo.prezzo = this.prezzo;
-        }
-        this.scontrino.push(articolo);
+      } else {
+        window.alert("I dati inseriti non sono validi.");
       }
-      console.log(JSON.stringify(this.scontrino));
     },
-    async inviaScontrino() {
-      var pagamento = {};
-      pagamento.pagamento = this.pagamento;
-      this.scontrino.push(pagamento)
-      await ClientService.inviaScontrino(this.scontrino);
+    aggiornaArticolo(index, data) {
+      this.$store.commit("cancellaArticolo", index);
+      this.$store.commit("aggiungiArticolo", data);
+    },
+    cancellaScotrino() {
+      this.$store.commit("cancellaScontrino");
+    },
+    isASCII(str) {
+      return /^[\x20-\x7F]*$/.test(str);
+    },
+    isNumeric(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    },
+  },
+  computed: {
+    ...mapGetters({ scontrino: "getScontrino" }),
+    sub: function () {
+      if (this.scontrino.length > 0) {
+        let sub = 0;
+        this.scontrino.forEach((el) => {
+          sub = sub + el.prezzo * el.quantita;
+        });
+        return sub.toFixed(2);
+      } else {
+        return 0;
+      }
     },
   },
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

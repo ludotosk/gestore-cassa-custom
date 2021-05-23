@@ -9,7 +9,8 @@ export default new Vuex.Store({
     pubkey: '',
     chiave: '',
     token: '',
-    scontrino: []
+    scontrino: [],
+    stampa: false,
   },
   mutations: {
     setPubkey(state,payload) {
@@ -30,6 +31,9 @@ export default new Vuex.Store({
     },
     cancellaArticolo(state,payload){
       state.scontrino.splice(payload, 1);
+    },
+    setStampa(state,payload){
+      state.stampa = payload;
     }
   },
   actions: {
@@ -48,6 +52,7 @@ export default new Vuex.Store({
     getPubkey: state => state.pubkey,
     getChiave: state => state.chiave,
     getToken: state => state.token,
-    getScontrino: state => state.scontrino
+    getScontrino: state => state.scontrino,
+    getStampa: state => state.stampa
   }
 })

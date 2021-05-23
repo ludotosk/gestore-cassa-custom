@@ -35,7 +35,7 @@ function isNumeric(value) {
 
 //controllo con una regex se i caratteri che ho ricevuto sono in ascii
 function isASCII(str) {
-    return /^[\x00-\x7F]*$/.test(str);
+    return /^[\x20-\x7F]*$/.test(str);
 }
 
 //elimino doppi apici in maniera ricorsiva

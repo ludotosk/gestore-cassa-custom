@@ -68,22 +68,32 @@ export default {
   },
   methods: {
     async login() {
-      var body = {};
-      body.codice = this.codice;
-      body.chiave = this.chiave;
-      let res = await CryttoService.encrypt(JSON.stringify(body), this.pubkey);
-      var response = await axios.post("login", res, {
-        headers: { "Content-Type": "text/plain" },
-      });
-      if (response.status == 200) {
-        var rispostaDec = JSON.parse(
-          await CryttoService.decSim(response.data, this.chiave)
+      if (this.isCodice(this.codice)) {
+        var body = {};
+        body.codice = this.codice;
+        body.chiave = this.chiave;
+        let res = await CryttoService.encrypt(
+          JSON.stringify(body),
+          this.pubkey
         );
-        this.$store.commit('setToken', rispostaDec.token);
-        this.redirect();
+        var response = await axios.post("login", res, {
+          headers: { "Content-Type": "text/plain" },
+        });
+        if (response.status == 200) {
+          var rispostaDec = JSON.parse(
+            await CryttoService.decSim(response.data, this.chiave)
+          );
+          this.$store.commit("setToken", rispostaDec.token);
+          this.redirect();
+        } else {
+          this.code = 500;
+        }
       } else {
-        this.code = 500;
+        window.alert('Inserire un codice valido')
       }
+    },
+    isCodice(codice) {
+      return /^\d{4}$/.test(codice);
     },
     redirect() {
       this.$router.push({ name: "Home" });
@@ -91,8 +101,8 @@ export default {
   },
   computed: {
     ...mapGetters({ pubkey: "getPubkey" }),
-    ...mapGetters({ chiave: "getChiave"}),
-    ...mapGetters({ token: "getToken"})
+    ...mapGetters({ chiave: "getChiave" }),
+    ...mapGetters({ token: "getToken" }),
   },
 };
 </script>
