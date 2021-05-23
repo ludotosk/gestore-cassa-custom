@@ -12,9 +12,11 @@ const pathPub = path.resolve(__dirname, 'chiavi/rsa_4096_pub.pem')
 //recupero chiave privata
 const pathPriv = path.resolve(__dirname, 'chiavi/rsa_4096_priv.pem')
 //copio la chive pubblica in una costante
-const pub = fs.readFileSync(pathPub, 'utf8')
+var pub = null;
 //copio la chive privata in una costante
-const priv = fs.readFileSync(pathPriv, 'utf8')
+var priv = null;
+//libreria per eseguire programmi in bash
+const { exec } = require("child_process");
 
 //controllo che l'indirizzo inserito sia un ip valido
 function isIP(indirizzo) {
@@ -97,4 +99,36 @@ function decSim(enc, key) {
     return deciphered
 }
 
-module.exports = { isASCII, rmApici, isIP, isNumeric, isCodice, makeid, encrypt, decrypt, encSim, decSim };
+//controllo l'esistenza della chiave privata (senza non va neanche la pubblica), nel caso non ci fosse la genero
+function checkFile() {
+    fs.access(pathPriv, fs.F_OK, (err) => {
+        if (err) {
+            console.log(`Genero chiavi crittografia`)
+            var pathChiavi = path.resolve(__dirname, 'chiavi')
+            exec("openssl genrsa -out rsa_4096_priv.pem 4096 && openssl rsa -pubout -in rsa_4096_priv.pem -out rsa_4096_pub.pem", { cwd: pathChiavi }, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+            });
+            //console.error(err)
+            return
+        }
+        console.log(`Trovate chiavi crittografia`)
+        pub = fs.readFileSync(pathPub, 'utf8')
+        priv = fs.readFileSync(pathPriv, 'utf8')
+        return
+        //file exists
+    })
+}
+
+function getPubkey(){
+    return pub
+}
+
+module.exports = { isASCII, rmApici, isIP, isNumeric, isCodice, makeid, encrypt, decrypt, encSim, decSim, checkFile, getPubkey };

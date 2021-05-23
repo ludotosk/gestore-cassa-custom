@@ -41,7 +41,7 @@ module.exports = function (app, opts, done) {
     //controllo che l'utente sia loggato
     app.addHook('preHandler', (request, reply, done) => {
         if (request.body.token) {
-            jwt.verify(request.body.token, 'secretkey', (err, authData) => {
+            jwt.verify(request.body.token, 'chiaveacaso', (err, authData) => {
                 if (err) {
                     reply.code(403)
                     done()

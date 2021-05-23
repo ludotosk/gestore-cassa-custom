@@ -1,3 +1,9 @@
+//copiare dati nella tabella virtuale
+/* INSERT INTO tabella_filtro(id,desc_breve)
+SELECT id_prodotto, desc_breve
+FROM prodotti
+ */
+
 //modalità strict non permette l'utilizzo di variabili senza assegnazione
 "use strict";
 
@@ -21,6 +27,19 @@ let db = new sqlite3.Database(dbPath, (err) => {
     console.log('Connessione al database')
 });
 
+function caricaVirtualTable(res) {
+    console.log('Carico tabella virtuale')
+    db.run(`INSERT INTO tabella_filtro(id,desc_breve)
+    SELECT id_prodotto, desc_breve
+    FROM prodotti`, [], function (err) {
+        if (err) {
+            return console.error(err.message);
+        }
+
+        console.log('Tabella virtuale caricata')
+    })
+}
+
 //funzioni per le select
 function selectCategoria_prodotto(res) {
     var categorie = []
@@ -39,7 +58,45 @@ function selectCategoria_prodotto(res) {
 
 function selectProdotti(res) {
     var prodotti = []
-    db.all('SELECT * FROM prodotti', [], (err, rows) => {
+    db.all(`SELECT descrizione, desc_breve, id_reparto, (listini.prezzo + (listini.prezzo * iva.aliquota_iva/100)) AS prezzo
+    FROM prodotti 
+    INNER JOIN dettaglio 
+    ON prodotti.id_prodotto = dettaglio.id_prodotti
+    INNER JOIN listini
+    ON prodotti.id_prodotto = listini.id_prodotto
+    INNER JOIN iva
+    ON listini.id_iva = iva.id_iva
+    GROUP BY prodotti.id_prodotto
+    ORDER BY COUNT(prodotti.id_prodotto) DESC
+    LIMIT 100;`, [], (err, rows) => {
+        if (err) {
+            res.code(400).send()
+            return console.error(err.message);
+        }
+        rows.forEach((row) => {
+            prodotti.push(row)
+        })
+        console.log(`Select su prodotti`)
+        res.code(200).send(prodotti)
+    })
+}
+
+function selectProdottiFiltrata(res, filtro) {
+    var prodotti = []
+    db.all(`SELECT descrizione, prodotti.desc_breve, id_reparto, (listini.prezzo + (listini.prezzo * iva.aliquota_iva/100)) AS prezzo
+    FROM tabella_filtro
+    INNER JOIN prodotti
+    ON prodotti.id_prodotto = tabella_filtro.id
+    INNER JOIN dettaglio 
+    ON prodotti.id_prodotto = dettaglio.id_prodotti
+    INNER JOIN listini
+    ON prodotti.id_prodotto = listini.id_prodotto
+    INNER JOIN iva
+    ON listini.id_iva = iva.id_iva
+    WHERE tabella_filtro.desc_breve MATCH ?
+    GROUP BY prodotti.id_prodotto
+    ORDER BY COUNT(prodotti.id_prodotto) DESC
+    LIMIT 100;`, [filtro], (err, rows) => {
         if (err) {
             res.code(400).send()
             return console.error(err.message);
@@ -246,7 +303,7 @@ module.exports = function (app, opts, done) {
     //controllo che l'utente sia loggato
     app.addHook('preHandler', (request, reply, done) => {
         if (request.body.token) {
-            jwt.verify(request.body.token, 'secretkey', (err, authData) => {
+            jwt.verify(request.body.token, 'chiaveacaso', (err, authData) => {
                 if (err) {
                     reply.code(403)
                     done()
@@ -378,6 +435,9 @@ module.exports = function (app, opts, done) {
             case "prova":
                 selectProva(res)
                 break;
+            case "prodotti_filtrati":
+                selectProdottiFiltrata(res, req.body.filtro)
+                break;
             default:
                 res.status(400).send('Selezionare una tabella valida')
         }
@@ -387,3 +447,4 @@ module.exports = function (app, opts, done) {
 }
 
 module.exports.db = db;
+module.exports.caricaVirtualTable = caricaVirtualTable;

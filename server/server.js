@@ -5,7 +5,7 @@
 const fastify = require('fastify')
 //lancio fastify
 const app = fastify({
-    //logger: { level: 'trace' }
+    logger: { level: 'trace' }
 })
 //libreria per le cross origin
 const fastifyCors = require("fastify-cors");
@@ -16,11 +16,8 @@ const dbModule = require('./routes/db')
 const db = dbModule.db
 //importo funzione per cancellare il codice all'avvio e alla chiusura del server
 const login = require('./routes/codiceLogin')
-
-//lancio lo script
-connessione.main()
-//cancello il file codice in caso di spegnimento del server senza close
-login.deleteCode()
+//libreria con funzioni varie
+const funzioniControllo = require(`./funzioniControllo`)
 
 // Middleware per le chiamate cross origin
 app.register(fastifyCors, {})
@@ -52,6 +49,19 @@ app.addHook('onClose', (instance, done) => {
         done()
     })
     login.deleteCode()
+})
+
+//qui lancio una serie di funzioni all'avvio del server
+app.addHook('onReady', function (done) {
+    //controllo che ci siano le chiavi di crittografia
+    funzioniControllo.checkFile()
+    //lancio lo script
+    connessione.main()
+    //cancello il file codice in caso di spegnimento del server senza close
+    login.deleteCode()
+    //carico la tabella filtro per poter fare ricerche regex nel db
+    dbModule.caricaVirtualTable()
+    done()
 })
 
 //funzione che chiude il server

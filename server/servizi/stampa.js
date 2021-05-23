@@ -4,7 +4,7 @@
 //import la libreria connessione
 const connessione = require('./connessione')
 //libreria controllo
-const controllo = require('../funzioniControllo')
+const funzioniControllo = require('../funzioniControllo')
 
 //dichiaro la variabile client
 var client
@@ -28,25 +28,25 @@ function setBody(scontrino) {
         //eseguo una forEach su body che dovrebbe essere un array per stampare lo scontrino
         //per ogni elemento controllo quali campi ci sono e in base a quelli stampo lo scontrino
         scontrino.forEach(el => {
-            if (el.reparto != undefined && controllo.isNumeric(el.reparto) == true) {
+            if (el.reparto != undefined && funzioniControllo.isNumeric(el.reparto) == true) {
                 var stringaArticolo = ''
-                if (el.descrizione != undefined && controllo.isASCII(el.descrizione) == true) {
-                    stringaArticolo += '"' + controllo.rmApici(el.descrizione) + '"'
+                if (el.descrizione != undefined && funzioniControllo.isASCII(el.descrizione) == true) {
+                    stringaArticolo += '"' + funzioniControllo.rmApici(el.descrizione) + '"'
                 }
                 if (el.quantita != undefined) {
                     var decimale = el.quantita.split('.')
                     if (decimale[1] != undefined) {
-                        if (controllo.isNumeric(decimale[0]) == true && controllo.isNumeric(decimale[1])) {
+                        if (funzioniControllo.isNumeric(decimale[0]) == true && funzioniControllo.isNumeric(decimale[1])) {
                             stringaArticolo += decimale[0] + '.' + decimale[1] + '*'
                         }
                     } else {
-                        if (controllo.isNumeric(el.quantita) == true) {
+                        if (funzioniControllo.isNumeric(el.quantita) == true) {
                             stringaArticolo += el.quantita + '*'
                         }
                     }
                 }
                 if (el.prezzo != undefined) {
-                    if (controllo.isNumeric(el.prezzo) == true) {
+                    if (funzioniControllo.isNumeric(el.prezzo) == true) {
                         stringaArticolo += el.prezzo + 'H'
                     }
                 }

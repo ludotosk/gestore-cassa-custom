@@ -35,7 +35,7 @@ module.exports = function (app, opts, done) {
             
             jwt.sign({ ip }, 'chiaveacaso', (err, token) => {
                 //elimino il codice quando inviio il token per liberare lo schermo
-                //codiceLogin.deleteCode()
+                codiceLogin.deleteCode()
                 res.send({ token })
             });
         } else {
