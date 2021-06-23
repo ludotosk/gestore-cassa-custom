@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = function (app, opts, done) {
     //funzione per modificare il body delle richieste prima che venga letto
+    //qui uso la chiave pubblica perché il client ancora non conosce la chiave simmetrica
     app.addHook('preValidation', async (request, reply) => {
         var decBody = await controllo.decrypt(request.body)
         request.body = JSON.parse(decBody)
@@ -36,7 +37,7 @@ module.exports = function (app, opts, done) {
             jwt.sign({ ip }, 'chiaveacaso', (err, token) => {
                 //elimino il codice quando inviio il token per liberare lo schermo
                 codiceLogin.deleteCode()
-                res.send({ token })
+                res.send({ token, chiaveServer: controllo.getChiaveServer() })
             });
         } else {
             console.log('Tentato login')

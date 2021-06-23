@@ -13,9 +13,11 @@ const jwt = login.jwt
 module.exports = function (app, opts, done) {
     //funzione per modificare il body delle richieste prima che venga letto
     app.addHook('preValidation', async (request, reply) => {
-        var decBody = await controllo.decrypt(request.body)
+        var decBody = await controllo.decSim(request.body)
+        //var decBody = await controllo.decrypt(request.body)
         request.body = JSON.parse(decBody)
     })
+
 
     //il payload è la risposta che esce dalla post e qui lo cripto per mandarlo
     app.addHook('preSerialization', async (request, reply, payload) => {
@@ -44,7 +46,7 @@ module.exports = function (app, opts, done) {
 
     //comunico via post solo per implementare la crittografia
     app.post('/', (req, res) => {
-        res.send({ Stato: connessione.getStatus() })
+        res.send({ stato: connessione.getStatus() })
     })
 
     done()

@@ -12,10 +12,11 @@ var client
 //importo la socket dallo script di connessione
 function setSocket() {
     //controllo di essere connesso per importare la socket
-    if (connessione.getStatus() == 'Connesso alla cassa e autenticato') {
+    if (connessione.getStatus() == 'connessa') {
         client = connessione.getSocket()
         return 0
     }
+    console.log('Stampa scontrino fallita per problemi con la cassa')
     return 1
 }
 
@@ -54,6 +55,26 @@ function setBody(scontrino) {
                 controllo = 1
                 client.write(stringaArticolo)
                 console.log(stringaArticolo)
+            }
+            //controllo per stamapre codice fiscale
+            if (el.cf != undefined){
+                //controllo che ci sia almeno un prodotto e che il codifi fiscale sia un ascii valido
+                if (controllo == 1 && funzioniControllo.isASCII(el.cf)){
+                    var stringaCf = `"` + el.cf + `"@`;
+                    client.write(stringaCf)
+                    client.write(`39F`)
+                    console.log(stringaCf + `39F`)
+                }
+            }
+            //controllo per stampare nome cliente
+            if (el.cliente != undefined){
+                //controllo che ci sia almeno un prodotto e che il codifi fiscale sia un ascii valido
+                if (controllo == 1 && funzioniControllo.isASCII(el.cliente)){
+                    var stringaCliente = `"` + el.cliente + `"@`;
+                    client.write(stringaCliente)
+                    client.write(`38F`)
+                    console.log(stringaCf + `38F`)
+                }
             }
             //se l'oggetto è quello del metodo di pagamento avvio uno switch case per inviare il metodo alla cassa
             if (el.pagamento != undefined) {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="lg:h-screen lg:mt-2">
     <!-- colonna lista prodotti -->
     <div
       class="flex flex-row bg-white rounded p-1 shadow lg:relative lg:top-0 bottom-32 fixed w-full"
@@ -8,6 +8,7 @@
         type="text"
         class="m-1 block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 w-full hover:border-blue-300"
         v-model="filtro"
+        @keyup.enter="getProdottiFiltrati"
       />
       <button
         v-if="prodotti != null"
@@ -35,7 +36,7 @@
         @click.prevent="
           aggiungiArticolo({
             reparto: prodotto.id_reparto,
-            quantita: 1,
+            quantita: '1',
             descrizione: prodotto.desc_breve,
             prezzo: prodotto.prezzo,
           })
@@ -57,11 +58,11 @@ export default {
   data() {
     return {
       filtro: "",
-      prodotti: null,
     };
   },
   methods: {
     aggiungiArticolo(data) {
+      console.log(data);
       if (
         this.isNumeric(data.quantita) &
         this.isNumeric(data.prezzo) &
@@ -76,7 +77,8 @@ export default {
               (el.descrizione == data.descrizione) &
               (el.prezzo == data.prezzo)
             ) {
-              data.quantita = el.quantita + data.quantita;
+              var somma = parseInt(el.quantita) + parseInt(data.quantita);
+              data.quantita = somma.toString();
               this.aggiornaArticolo(this.scontrino.indexOf(el), data);
               aggiornato = true;
             }
@@ -99,14 +101,18 @@ export default {
       var body = {};
       body.token = this.token;
       body.chiave = this.chiave;
-      let enc = await CryttoService.encrypt(JSON.stringify(body), this.pubkey);
+      //let enc = await CryttoService.encrypt(JSON.stringify(body), this.pubkey);
+      let enc = await CryttoService.encSim(
+        JSON.stringify(body),
+        this.chiaveServer
+      );
       var resEnc = await axios.post("db/get/prodotti", enc, {
         headers: { "Content-Type": "text/plain" },
       });
       var res = JSON.parse(
         await CryttoService.decSim(resEnc.data, this.chiave)
       );
-      this.prodotti = res;
+      this.$store.commit("setProdotti", res);
     },
     async getProdottiFiltrati() {
       if (this.filtro == "") {
@@ -117,14 +123,18 @@ export default {
       body.token = this.token;
       body.chiave = this.chiave;
       body.filtro = this.filtro;
-      let enc = await CryttoService.encrypt(JSON.stringify(body), this.pubkey);
+      //let enc = await CryttoService.encrypt(JSON.stringify(body), this.pubkey);
+      let enc = await CryttoService.encSim(
+        JSON.stringify(body),
+        this.chiaveServer
+      );
       var resEnc = await axios.post("db/get/prodotti_filtrati", enc, {
         headers: { "Content-Type": "text/plain" },
       });
       var res = JSON.parse(
         await CryttoService.decSim(resEnc.data, this.chiave)
       );
-      this.prodotti = res;
+      this.$store.commit("setProdotti", res);
     },
     isASCII(str) {
       return /^[\x20-\x7F]*$/.test(str);
@@ -133,11 +143,18 @@ export default {
       return !isNaN(parseFloat(n)) && isFinite(n);
     },
   },
+  watch: {
+    chiaveServer: function () {
+      this.getProdotti();
+    },
+  },
   computed: {
     ...mapGetters({ pubkey: "getPubkey" }),
     ...mapGetters({ chiave: "getChiave" }),
     ...mapGetters({ token: "getToken" }),
     ...mapGetters({ scontrino: "getScontrino" }),
+    ...mapGetters({ chiaveServer: "getChiaveServer" }),
+    ...mapGetters({ prodotti: "getProdotti" }),
   },
 };
 </script>

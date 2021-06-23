@@ -27,7 +27,8 @@ const indirizzoOptions = {
 module.exports = function (app, opts, done) {
     //funzione per modificare il body delle richieste prima che venga letto
     app.addHook('preValidation', async (request, reply) => {
-        var decBody = await controllo.decrypt(request.body)
+        var decBody = await controllo.decSim(request.body)
+        //var decBody = await controllo.decrypt(request.body)
         request.body = JSON.parse(decBody)
     })
 
@@ -65,8 +66,21 @@ module.exports = function (app, opts, done) {
             connessione.testConnessione(indirizzo)
             res.code(200).send()
         } else {
-            connessione.setStatus('Questo non è un indirizzo IP valido')
-            res.code(400).send({ Stato: 'Questo non è un indirizzo IP valido' })
+            connessione.setStatus('disconnesso')
+            res.code(400).send()
+        }
+
+    })
+
+    app.post('/auto', (req, res) => {
+        //modalità automatica per la connessione alla cassa
+        if (connessione.getStatus() != 'connessa') {
+            console.log('Modalità automatica ricerca cassa')
+            connessione.main()
+            res.code(200).send()
+        } else {
+            console.log('Salto la connessione automatica perché già connesso')
+            res.code(200).send()
         }
     })
 

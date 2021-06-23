@@ -10,7 +10,8 @@ export default new Vuex.Store({
     chiave: '',
     token: '',
     scontrino: [],
-    stampa: false,
+    chiaveServer: '',
+    prodotti: null
   },
   mutations: {
     setPubkey(state,payload) {
@@ -32,8 +33,11 @@ export default new Vuex.Store({
     cancellaArticolo(state,payload){
       state.scontrino.splice(payload, 1);
     },
-    setStampa(state,payload){
-      state.stampa = payload;
+    setChiaveServer(state,payload){
+      state.chiaveServer = payload;
+    },
+    setProdotti(state,payload){
+      state.prodotti = payload;
     }
   },
   actions: {
@@ -53,6 +57,7 @@ export default new Vuex.Store({
     getChiave: state => state.chiave,
     getToken: state => state.token,
     getScontrino: state => state.scontrino,
-    getStampa: state => state.stampa
+    getChiaveServer: state => state.chiaveServer,
+    getProdotti: state => state.prodotti,
   }
 })

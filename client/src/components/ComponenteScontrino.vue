@@ -7,14 +7,14 @@
         <label class="font-semibold mt-2.5">Art: </label>
         <input
           type="text"
-          placeholder="Descizione da tastiera"
+          placeholder="Descizione manuale"
           class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
           v-model="descrizione_libera"
         />
         <label class="font-semibold mt-2.5">Rep: </label>
         <input
           type="text"
-          placeholder="Reparto da tastiera"
+          placeholder="Reparto manuale"
           class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
           v-model="reparto_libero"
         />
@@ -23,14 +23,14 @@
         <label class="font-semibold mt-2.5">Qta: </label>
         <input
           type="text"
-          placeholder="Quantità da tastiera"
+          placeholder="Quantità manuale"
           class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
           v-model="quantita_libera"
         />
         <label class="font-semibold mt-2.5">Unità: </label>
         <input
           type="text"
-          placeholder="Prezzo unità"
+          placeholder="Prezzo manuale"
           class="w-full block rounded-md bg-gray-100 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0 m-1 hover:border-blue-300"
           v-model="prezzo_libero"
         />
@@ -108,6 +108,7 @@
     </div>
     <div
       class="flex flex-row lg:relative lg:bottom-0 fixed bottom-44 w-full bg-blue-50"
+      v-if="prodotti != null"
     >
       <button
         class="w-full bg-red-500 rounded shadow m-1 mb-3 lg:h-12 hover:bg-red-600"
@@ -115,12 +116,11 @@
       >
         Cancella scontrino
       </button>
-      <button
-        class="w-full bg-green-500 rounded shadow m-1 mb-3 lg:h-12 hover:bg-green-600"
-        @click.prevent="$store.commit('setStampa', true)"
+      <router-link
+        to="/Pagamento"
+        class="w-full bg-green-500 rounded shadow m-1 mb-3 lg:h-12 hover:bg-green-600 text-center p-3"
+        >Stampa</router-link
       >
-        Stampa
-      </button>
       <p
         class="w-full bg-blue-500 rounded shadow m-1 mb-3 lg:h-12 text-center p-3"
       >
@@ -135,6 +135,14 @@ import { mapGetters } from "vuex";
 
 export default {
   name: "scontrino",
+  data() {
+    return {
+      prezzo_libero: "",
+      quantita_libera: "",
+      descrizione_libera: "",
+      reparto_libero: "",
+    };
+  },
   methods: {
     aggiungiArticolo(data) {
       if (
@@ -182,6 +190,7 @@ export default {
   },
   computed: {
     ...mapGetters({ scontrino: "getScontrino" }),
+    ...mapGetters({ prodotti: "getProdotti" }),
     sub: function () {
       if (this.scontrino.length > 0) {
         let sub = 0;

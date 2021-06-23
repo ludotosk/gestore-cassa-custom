@@ -33,6 +33,17 @@ class CryttoService {
         return encrypted.toString('base64')
     }
 
+    //cifratura chiave simmetrica
+    static async encSim(text, key) {
+        var iv = crypto.randomBytes(16);
+        var cipher = crypto.createCipheriv('aes256', key, iv);
+        var ciphered = cipher.update(text, 'utf8', 'hex');
+        ciphered += cipher.final('hex');
+        var ciphertext = iv.toString('hex') + ':' + ciphered
+        return ciphertext;
+    }
+
+
     //funzione per creare stringhe casuali
     static async makeid(length) {
         var result = [];
@@ -44,7 +55,7 @@ class CryttoService {
         }
         return result.join('');
     }
-    
+
 
 }
 

@@ -28,9 +28,11 @@ const scontrinoOptions = {
 module.exports = function (app, opts, done) {
     //funzione per modificare il body delle richieste prima che venga letto
     app.addHook('preValidation', async (request, reply) => {
-        var decBody = await controllo.decrypt(request.body)
+        var decBody = await controllo.decSim(request.body)
+        //var decBody = await controllo.decrypt(request.body)
         request.body = JSON.parse(decBody)
     })
+
 
     //il payload è la risposta che esce dalla post e qui lo cripto per mandarlo
     app.addHook('preSerialization', async (request, reply, payload) => {
@@ -60,6 +62,7 @@ module.exports = function (app, opts, done) {
     app.post('/', scontrinoOptions, (req, res) => {
         //controllo che ci sia la socket in stampa per procedere con la stampa
         if (stampa.setSocket() == 0) {
+            console.log('Stampo scontrino')
             stampa.setBody(req.body.scontrino)
             res.status(201).send()
         } else {

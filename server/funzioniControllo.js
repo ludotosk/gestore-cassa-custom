@@ -59,6 +59,9 @@ function makeid(length) {
     return result.join('');
 }
 
+//creo la chiave crittografica per comunicazione client server
+const chiaveServer = makeid(32)
+
 //cifratura dati con chiave pubblica
 function encrypt(toEncrypt) {
     const buffer = Buffer.from(toEncrypt, 'utf8')
@@ -90,17 +93,18 @@ function encSim(text, key) {
 }
 
 //decifratura chiave simmetrica
-function decSim(enc, key) {
+//modificata per usare la chiave del server, prima prendeva la chiave come parametro
+function decSim(enc) {
     var components = enc.split(':');
     var iv_from_ciphertext = Buffer.from(components.shift(), 'hex');
-    var decipher = crypto.createDecipheriv('aes256', key, iv_from_ciphertext);
+    var decipher = crypto.createDecipheriv('aes256', chiaveServer, iv_from_ciphertext);
     var deciphered = decipher.update(components.join(':'), 'hex', 'utf8');
     deciphered += decipher.final('utf8');
     return deciphered
 }
 
 //controllo l'esistenza della chiave privata (senza non va neanche la pubblica), nel caso non ci fosse la genero
-function checkFile() {
+function checkKey() {
     fs.access(pathPriv, fs.F_OK, (err) => {
         if (err) {
             console.log(`Genero chiavi crittografia`)
@@ -127,8 +131,14 @@ function checkFile() {
     })
 }
 
+//funzione per condividere chiave pubblica
 function getPubkey(){
     return pub
 }
 
-module.exports = { isASCII, rmApici, isIP, isNumeric, isCodice, makeid, encrypt, decrypt, encSim, decSim, checkFile, getPubkey };
+//funzione per condividere chiave simmetrica server
+function getChiaveServer(){
+    return chiaveServer
+}
+
+module.exports = { isASCII, rmApici, isIP, isNumeric, isCodice, makeid, encrypt, decrypt, encSim, decSim, checkKey, getPubkey, getChiaveServer };

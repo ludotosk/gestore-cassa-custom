@@ -5,7 +5,7 @@
 const fastify = require('fastify')
 //lancio fastify
 const app = fastify({
-    logger: { level: 'trace' }
+    //logger: { level: 'trace' }
 })
 //libreria per le cross origin
 const fastifyCors = require("fastify-cors");
@@ -30,7 +30,8 @@ app.register(require('./routes/status'), { prefix: '/status' })
 app.register(require('./routes/indirizzo'), { prefix: '/indirizzo' })
 app.register(require('./routes/login'), { prefix: '/login' })
 app.register(require('./routes/pubkey'), { prefix: '/pubkey' })
-app.register(require('./routes/codiceLogin.js'), { prefix: '/codice' })
+app.register(require('./routes/codiceLogin'), { prefix: '/codice' })
+app.register(require('./routes/keyServer'), { prefix: '/key' })
 
 // Start the server
 app.listen(3000, '0.0.0.0', function (err, address) {
@@ -48,15 +49,14 @@ app.addHook('onClose', (instance, done) => {
         console.log('Chiusura database');
         done()
     })
+    dbModule.cancellaTimer();
     login.deleteCode()
 })
 
 //qui lancio una serie di funzioni all'avvio del server
 app.addHook('onReady', function (done) {
     //controllo che ci siano le chiavi di crittografia
-    funzioniControllo.checkFile()
-    //lancio lo script
-    connessione.main()
+    funzioniControllo.checkKey()
     //cancello il file codice in caso di spegnimento del server senza close
     login.deleteCode()
     //carico la tabella filtro per poter fare ricerche regex nel db

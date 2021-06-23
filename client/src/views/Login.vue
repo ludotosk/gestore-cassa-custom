@@ -17,6 +17,7 @@
             type="text"
             placeholder="Inserire il codice mostrato sullo schermo del computerino"
             v-model="codice"
+            @keyup.enter="login"
           />
         </div>
         <button
@@ -83,6 +84,7 @@ export default {
           var rispostaDec = JSON.parse(
             await CryttoService.decSim(response.data, this.chiave)
           );
+          this.$store.commit("setChiaveServer", rispostaDec.chiaveServer);
           this.$store.commit("setToken", rispostaDec.token);
           this.redirect();
         } else {

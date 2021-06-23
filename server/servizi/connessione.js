@@ -7,11 +7,11 @@ var net = require('net')
 const controlli = require('../funzioniControllo')
 
 //stato da mandare al web server
-var stato = 'Non eseguito'
+var stato = 'disconnessa'
 
 //variabili di controllo, quando hanno lo stesso valore sono state terminate tutte le scansione e si attiva l'inserimento manuale
 var scansioni = 0
-var terminate = 0
+//var terminate = 0
 
 //variabile per attivazione inserimeneto manuale, in questo caso lo disattiva se viene trovato almeno un indirizzo
 var controllo = 0
@@ -43,15 +43,15 @@ function getSocket() {
 //controllo che la cassa risponda
 function testEcho() {
   if (echo == 0) {
-    stato = 'Connession fallita - Chiusura connessione'
+    stato = 'disconnessa'
     console.log("Connessione alla cassa fallita!\nControllare che la cassa sia in modalità FPU e che l'indirizzo sia corretto\nPremere il tasto x della cassa in modalità FPU per verificare l'indirizzo")
   } else {
-    stato = 'Connesso alla cassa eseguire autenticazione'
+    stato = 'connessa'
     echo = 0
   }
 }
 
-// autenticazione alla cassa via web
+/* // autenticazione alla cassa via web
 async function autenticazioneWeb(codiceAut) {
   if (controlli.isCodice(codiceAut) == true) {
     stato = 'Autenticazione in corso'
@@ -76,27 +76,30 @@ async function autenticazioneWeb(codiceAut) {
     stato = 'Codice Errato'
     return 1
   }
-}
+} */
 
 //funzione per la connessione via socket alla cassa se la cassa risponde vuol dire che tutto funziona
 //viene chiamato internamente se si trova un indirizzo valido o via web se in caso di inserimento manuale
 function testConnessione(indirizzo) {
   if (controlli.isIP(indirizzo) == true) {
-    stato = 'Test connessione in corso'
+    stato = 'disconnessa'
 
     //connetto la socket alla cassa
     client.connect(9100, indirizzo, function () {
       //assegno 0 a echo perché in caso di risposta verrà cambiato con 1 e allora sarà avvenuta con successo la connessione
       echo = 0
-      client.write('"Codice collegamento"1%')
-      client.write('"' + codice + '"2%')
-      console.log(codice)
+      //client.write('"Codice collegamento"1%')
+      //client.write('"' + codice + '"2%')
+      //console.log(codice)
+      stato = 'connessa'
+      console.log('Conesso alla cassa')
+      client.write('"Conesso al pc"1%')
       setTimeout(testEcho, 1000)
     });
 
     //gestisco errori di connessione
     client.on('error', function (ex) {
-      stato = 'Errore nella socket - Chiusura connessione'
+      stato = 'disconnessa'
       console.log("Erorre nella connessione alla cassa: " + indirizzo + "\nL'indirizzo potrebbe essere errato o la cassa potrebbe non essere in modalità FPU\nPremere il tasto x della cassa in modalità FPU per verificare l'indirizzo");
     });
 
@@ -108,22 +111,22 @@ function testConnessione(indirizzo) {
     });
 
   } else {
-    stato = 'Questo non è un indirizzo IP valido'
+    stato = 'disconnessa'
   }
 }
 
 //funzione per controllare la necessità di insersire l'ip manualmente
-function testRisultatoScansione() {
+/* function testRisultatoScansione() {
   //controllo per usare l'inserimento manuale solo una volta
   if (scansioni == terminate) {
-    stato = 'Inserimento manuale'
+    stato = 'disconnessa'
     console.log(`Eseguire l'inserimento manuale`)
   }
 }
-
+ */
 //funzione per verificare che l'indirizzo trovato abbia il web server di custom
 function testWeb(indirizzo) {
-  stato = 'Test server web in corso'
+  console.log('Test server web cassa: ' + indirizzo)
   //codice per la request http preso dal sito di node
   const http = require('http');
 
@@ -135,9 +138,10 @@ function testWeb(indirizzo) {
       testConnessione(indirizzo)
     } else {
       console.log("Web server errato per l'indirizzo: " + indirizzo)
-      testRisultatoScansione()
+      //testRisultatoScansione()
     }
   }).on('error', (err) => {
+    console.log('Si è verificato un errore con il test web server')
     //console.error(err);
   }).end();
 }
@@ -215,16 +219,16 @@ async function main() {
         })
 
         //alla fine di ogni scansione incremento il numero di scansioni terminate per il controllo sul incremento manuale
-        terminate += 1
+        //terminate += 1
         //chiamo incremento manuale se non ho trovato nulla in questa scheda
         if (controllo == 0) {
-          testRisultatoScansione()
+          //testRisultatoScansione()
         }
 
       });
 
       console.log('Avvio scansione scheda ' + res.dev)
-      stato = 'Avvio scansione scheda ' + res.dev
+      stato = 'disconnessa'
       evilscan.run();
     })
   }
@@ -232,4 +236,4 @@ async function main() {
 }
 
 //module exports server a rendere disponibili ad altri js le due funzioni
-module.exports = { getStatus, autenticazioneWeb, testConnessione, getSocket, main, setStatus }
+module.exports = { getStatus, testConnessione, getSocket, main, setStatus }

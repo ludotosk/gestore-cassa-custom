@@ -27,7 +27,8 @@ const codiceOptions = {
 module.exports = function (app, opts, done) {
     //funzione per modificare il body delle richieste prima che venga letto
     app.addHook('preValidation', async (request, reply) => {
-        var decBody = await controllo.decrypt(request.body)
+        var decBody = await controllo.decSim(request.body)
+        //var decBody = await controllo.decrypt(request.body)
         request.body = JSON.parse(decBody)
     })
 
