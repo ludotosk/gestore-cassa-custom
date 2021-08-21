@@ -18,9 +18,9 @@
       >Database</router-link
     >
     <router-link
-      to="/"
+      to="/Chiusura"
       class="m-1 lg:p-2 h-6 lg:h-10 bg-blue-300 rounded px-1 hover:bg-blue-400 shadow"
-      ><img src="@/assets/setting.svg" class="h-4 m-1"
+      ><img src="@/assets/key.svg" class="h-4 m-1"
     /></router-link>
   </div>
 </template>
@@ -59,7 +59,7 @@ export default {
         let res = JSON.parse(
           await CryttoService.decSim(resEnc.data, this.chiave)
         );
-        console.log(res);
+        //console.log(res);
         this.id += 1;
         this.stateArray = [{ stato: res.stato, id: this.id }];
       } catch (error) {

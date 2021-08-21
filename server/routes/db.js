@@ -45,7 +45,7 @@ function creaTabelle() {
         "categoria"	TEXT
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -55,7 +55,7 @@ function creaTabelle() {
         "desc_iva"	TEXT
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -73,7 +73,7 @@ function creaTabelle() {
         "id_categoria"	INTEGER
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -83,7 +83,7 @@ function creaTabelle() {
         PRIMARY KEY("id_reparto")
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -96,14 +96,14 @@ function creaTabelle() {
         "numero_scontrino"	INTEGER NOT NULL UNIQUE
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
     db.run(`CREATE VIRTUAL TABLE tabella_virtuale
     USING FTS5(id_prodotto, descrizione, desc_breve, id_reparto, prezzo_iva, vendite)`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -117,7 +117,7 @@ function creaTabelle() {
         FOREIGN KEY("id_prodotti") REFERENCES "prodotti"("id_prodotto")
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -132,7 +132,7 @@ function creaTabelle() {
         FOREIGN KEY("id_prodotto") REFERENCES "prodotti"("id_prodotto")
     )`, [], function () {
         i--;
-        if(i == 0){
+        if (i == 0) {
             caricaVirtualTable()
         }
     })
@@ -140,30 +140,67 @@ function creaTabelle() {
 
 //creo la tabella virtuale per leggere i dati nel client
 function caricaVirtualTable() {
-    console.log('Carico tabella virtuale')
-    db.run(`INSERT INTO tabella_virtuale(id_prodotto, descrizione, desc_breve, id_reparto, prezzo_iva, vendite)
-    SELECT prodotti.id_prodotto, descrizione, desc_breve, id_reparto, (listini.prezzo + (listini.prezzo * iva.aliquota_iva/100)) AS prezzo, COUNT(prodotti.id_prodotto) AS vendite
-    FROM prodotti 
-    INNER JOIN dettaglio 
-    ON prodotti.id_prodotto = dettaglio.id_prodotti
-    INNER JOIN listini
-    ON prodotti.id_prodotto = listini.id_prodotto
-    INNER JOIN iva
-    ON listini.id_iva = iva.id_iva
-    GROUP BY prodotti.id_prodotto
-    `, [], function (err) {
+    console.log('Controllo numero prodotti vendite')
+    var prodotti = [];
+    db.all('SELECT * FROM dettaglio GROUP BY id_prodotti', [], (err, rows) => {
         if (err) {
-            //qui vado a usare fs per leggere i dati del database se vedo che ha peso 0 creo le tabelle al suo interno
-            //all'apertura del db se non c'è il file viene creato quindi troverò sempre un file a questo punto
-            const fs = require('fs');
-            var db = fs.statSync(dbPath)
-            if (db.size == 0) {
-                creaTabelle()
-            }
             return console.error(err.message);
         }
+        rows.forEach((row) => {
+            prodotti.push(row)
+        })
+        console.log(`Numero di prodotti venduti: ` + prodotti.length)
+        if (prodotti.length >= 100) {
+            console.log('Carico tabella virtuale ordinata per vendite')
+            db.run(`INSERT INTO tabella_virtuale(id_prodotto, descrizione, desc_breve, id_reparto, prezzo_iva, vendite)
+            SELECT prodotti.id_prodotto, descrizione, desc_breve, id_reparto, (listini.prezzo + (listini.prezzo * iva.aliquota_iva/100)) AS prezzo, COUNT(prodotti.id_prodotto) AS vendite
+            FROM prodotti 
+            INNER JOIN dettaglio 
+            ON prodotti.id_prodotto = dettaglio.id_prodotti
+            INNER JOIN listini
+            ON prodotti.id_prodotto = listini.id_prodotto
+            INNER JOIN iva
+            ON listini.id_iva = iva.id_iva
+            GROUP BY prodotti.id_prodotto
+            `, [], function (err) {
+                if (err) {
+                    //qui vado a usare fs per leggere i dati del database se vedo che ha peso 0 creo le tabelle al suo interno
+                    //all'apertura del db se non c'è il file viene creato quindi troverò sempre un file a questo punto
+                    const fs = require('fs');
+                    var db = fs.statSync(dbPath)
+                    if (db.size == 0) {
+                        creaTabelle()
+                    }
+                    return console.error(err.message);
+                }
 
-        console.log('Tabella virtuale caricata')
+                console.log('Tabella virtuale caricata')
+            })
+        } else {
+            console.log('Tabella virtuale senza vendite')
+            db.run(`INSERT INTO tabella_virtuale(id_prodotto, descrizione, desc_breve, id_reparto, prezzo_iva)
+            SELECT prodotti.id_prodotto, descrizione, desc_breve, id_reparto, (listini.prezzo + (listini.prezzo * iva.aliquota_iva/100)) AS prezzo
+            FROM prodotti 
+            INNER JOIN listini
+            ON prodotti.id_prodotto = listini.id_prodotto
+            INNER JOIN iva
+            ON listini.id_iva = iva.id_iva
+            GROUP BY prodotti.id_prodotto
+            `, [], function (err) {
+                if (err) {
+                    //qui vado a usare fs per leggere i dati del database se vedo che ha peso 0 creo le tabelle al suo interno
+                    //all'apertura del db se non c'è il file viene creato quindi troverò sempre un file a questo punto
+                    const fs = require('fs');
+                    var db = fs.statSync(dbPath)
+                    if (db.size == 0) {
+                        creaTabelle()
+                    }
+                    return console.error(err.message);
+                }
+
+                console.log('Tabella virtuale caricata')
+            })
+        }
     })
 }
 
@@ -183,6 +220,21 @@ function selectCategoria_prodotto(res) {
     })
 }
 
+function selectProdottiRaw(res) {
+    var prodotti = []
+    db.all(`SELECT * FROM prodotti`, [], (err, rows) => {
+        if (err) {
+            res.code(400).send()
+            return console.error(err.message);
+        }
+        rows.forEach((row) => {
+            prodotti.push(row)
+        })
+        console.log(`Select su prodotti non elaborati`)
+        res.code(200).send(prodotti)
+    })
+}
+
 function selectProdotti(res) {
     var prodotti = []
     db.all(`SELECT id_prodotto, descrizione, desc_breve, id_reparto, prezzo_iva AS prezzo FROM tabella_virtuale
@@ -195,7 +247,7 @@ function selectProdotti(res) {
         rows.forEach((row) => {
             prodotti.push(row)
         })
-        console.log(`Select su prodotti`)
+        console.log(`Select su prodotti da tabella virtuale`)
         res.code(200).send(prodotti)
     })
 }
@@ -327,7 +379,7 @@ const optCategoria = {
             type: 'object',
             required: ['categoria'],
             properties: {
-                categoria: { type: 'object' },
+                categoria: { type: 'string' },
             }
         }
     }
@@ -436,45 +488,50 @@ module.exports = function (app, opts, done) {
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`)
+            console.log(`Creata riga con id ${this.lastID}`)
             res.code(201).send()
         })
     })
 
     app.post('/categoria_prodotto', optCategoria, (req, res) => {
+        console.log('Insert in categoria')
         db.run('INSERT INTO categoria_prodotto(categoria) VALUES(?)', [req.body.categoria], function (err) {
             if (err) {
                 res.code(400).send()
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`)
+            console.log(`Creata categoria con id ${this.lastID}`)
             res.code(201).send()
         })
     })
 
     app.post('/iva', optIva, (req, res) => {
+        console.log('Insert iva')
         var iva = req.body.iva;
+        if (!controllo.isNumeric(iva.aliquota_iva)) {
+            res.code(400).send(`Aliquota iva dev'essere numerica`)
+        }
         db.run('INSERT INTO iva(aliquota_iva, desc_iva) VALUES(?,?)', [iva.aliquota_iva, iva.desc_iva], function (err) {
             if (err) {
                 res.code(400).send()
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`)
+            console.log(`Creata Iva con id ${this.lastID}`)
             res.code(201).send()
         })
     })
 
     app.post('/listini', optListini, (req, res) => {
         var listini = req.body.listini;
-        db.run('INSERT INTO listini(id_prodotto, nome_listino, id_iva, sc_rc, prezzo) VALUES(?,?,?,?,?)', [listini.id_prodotto, listini.nome_listino, listini.id_iva, listini.sc_rc, listini.prezzo], function (err) {
+        db.run('INSERT INTO listini(id_prodotto, nome_listino, id_iva, sc_rc, prezzo) VALUES(?,?,?,?,?)', [listini.id_prodotto, listini.nome, listini.id_iva, listini.sconto, listini.prezzo], function (err) {
             if (err) {
                 res.code(400).send();
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`);
+            console.log(`Creata riga con id ${this.lastID}`);
             res.code(201).send();
         });
     })
@@ -487,20 +544,23 @@ module.exports = function (app, opts, done) {
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`);
+            console.log(`Creata riga con id ${this.lastID}`);
             res.code(201).send();
         })
     })
 
     app.post('/reparto', optReparto, (req, res) => {
         var reparto = req.body.reparto;
-        db.run('INSERT INTO reparto(desc_reparto) VALUES(?,?)', [reparto.desc_reparto], function (err) {
+        if (!controllo.isNumeric(reparto.id_reparto)) {
+            res.code(400).send(`Numero reparto dev'essere numerico`);
+        }
+        db.run('INSERT INTO reparto(id_reparto, desc_reparto) VALUES(?,?)', [reparto.id_reparto, reparto.desc_reparto], function (err) {
             if (err) {
                 res.code(400).send();
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`);
+            console.log(`Creata riga con id ${this.lastID}`);
             res.code(201).send();
         })
     });
@@ -513,7 +573,7 @@ module.exports = function (app, opts, done) {
                 return console.error(err.message);
             }
 
-            console.log(`Creata riga con ${this.lastID}`);
+            console.log(`Creata riga con id ${this.lastID}`);
             res.code(201).send();
         })
     })
@@ -526,6 +586,9 @@ module.exports = function (app, opts, done) {
                 break;
             case "prodotti":
                 selectProdotti(res)
+                break;
+            case "prodottiRaw":
+                selectProdottiRaw(res)
                 break;
             case "listini":
                 selectListini(res)

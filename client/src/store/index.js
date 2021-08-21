@@ -11,7 +11,8 @@ export default new Vuex.Store({
     token: '',
     scontrino: [],
     chiaveServer: '',
-    prodotti: null
+    prodotti: null,
+    dbpage: true,
   },
   mutations: {
     setPubkey(state,payload) {
@@ -27,7 +28,7 @@ export default new Vuex.Store({
     aggiungiArticolo(state,payload){
       state.scontrino.push(payload);
     },
-    cancellaScontrino(state,){
+    cancellaScontrino(state){
       state.scontrino = [];
     },
     cancellaArticolo(state,payload){
@@ -38,6 +39,9 @@ export default new Vuex.Store({
     },
     setProdotti(state,payload){
       state.prodotti = payload;
+    },
+    setDbpage(state,payload){
+      state.dbpage = payload;
     }
   },
   actions: {
@@ -59,5 +63,6 @@ export default new Vuex.Store({
     getScontrino: state => state.scontrino,
     getChiaveServer: state => state.chiaveServer,
     getProdotti: state => state.prodotti,
+    getDbpage: state => state.dbpage
   }
 })

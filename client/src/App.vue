@@ -1,11 +1,11 @@
 <template>
-  <div id="app" class="bg-blue-50 h-screen lg:overflow-y-hidden">
+  <div id="app" class="bg-blue-50 h-screen" v-bind:class="{ 'lg:overflow-y-hidden': dbpage }">
     <router-view/>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   methods: {
@@ -15,5 +15,8 @@ export default {
     this.setPubkey();
     this.setChiave();
   },
+  computed: {
+    ...mapGetters({dbpage: "getDbpage"})
+  }
 }
 </script>

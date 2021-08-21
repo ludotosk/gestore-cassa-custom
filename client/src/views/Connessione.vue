@@ -1,7 +1,16 @@
 <template>
   <div class="flex flex-row items-center justify-center bg-blue-50">
     <div
-      class="bg-white shadow m-10 p-4 rounded grid justify-items-center space-x-4 space-y-2"
+      class="
+        bg-white
+        shadow
+        m-10
+        p-4
+        rounded
+        grid
+        justify-items-center
+        space-x-4 space-y-2
+      "
     >
       <p class="font-semibold">Connessione alla cassa</p>
       <div class="flex flex-row bg-red-400 p-2 rounded shadow">
@@ -11,7 +20,10 @@
         <input class="bg-gray-100 rounded w-8" v-model="ind4" />
       </div>
       <div class="flex flex-row space-x-2">
-        <button class="bg-green-400 hover:bg-green-500 p-1 rounded shadow" @click="connetti">
+        <button
+          class="bg-green-400 hover:bg-green-500 p-1 rounded shadow"
+          @click="connetti"
+        >
           Connetti
         </button>
         <button
@@ -99,7 +111,8 @@ export default {
   },
   methods: {
     async connetti() {
-      var indirizzo = this.ind1 + "." + this.ind2 + "." + this.ind3 + "." + this.ind4;
+      var indirizzo =
+        this.ind1 + "." + this.ind2 + "." + this.ind3 + "." + this.ind4;
       if (this.isIP(indirizzo)) {
         var body = {};
         body.chiave = this.chiave;
@@ -109,18 +122,24 @@ export default {
           JSON.stringify(body),
           this.chiaveServer
         );
-        var res = await axios.post("indirizzo", enc, {
-          headers: { "Content-Type": "text/plain" },
-        });
+        var res = await axios
+          .post("indirizzo", enc, {
+            headers: { "Content-Type": "text/plain" },
+          })
+          .catch((err) => {
+            if (err.response) {
+              window.alert(
+                `C'è stato un problema nella connessione, riprovare.`
+              );
+            }
+          });
       } else {
         window.alert("Inserire un indirizzo valido!");
       }
-      if(res.status == 200){
-        window.alert('Aspettare qualche secondo e la cassa sarà connessa.')
+      if (res.status == 200) {
+        window.alert("Aspettare qualche secondo e la cassa sarà connessa.");
         this.$router.push({ name: "Home" });
-      } else {
-        window.alert(`C'è stato un problema nella connessione, riprovare.`)
-      }
+      } 
     },
     async auto() {
       var body = {};

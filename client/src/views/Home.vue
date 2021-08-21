@@ -95,6 +95,9 @@ export default {
       });
     },
   },
+  async created() {
+       this.$store.commit("setDbpage", true);
+  },
   watch: {
     chiaveServer: function () {
       this.checkToken();
