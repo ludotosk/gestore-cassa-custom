@@ -17,11 +17,6 @@
       class="m-1 lg:p-2 h-6 lg:h-10 bg-blue-300 rounded px-1 hover:bg-blue-400 shadow"
       >Database</router-link
     >
-    <router-link
-      to="/Chiusura"
-      class="m-1 lg:p-2 h-6 lg:h-10 bg-blue-300 rounded px-1 hover:bg-blue-400 shadow"
-      ><img src="@/assets/key.svg" class="h-4 m-1"
-    /></router-link>
   </div>
 </template>
 
