@@ -9,7 +9,7 @@ With this server, you can control your Custom cash register present in the local
 * can run in less than 100 Mb of ram
 * authentication
 ### A video where I show to a friend of mine how the login works and some interface features
-[![Watch the video](https://lh3.googleusercontent.com/FaF4OsCMVmLWXKnugf77A7-u4ry_9ky7wxZ7Lnj43Nz5OHYJiJNrk4zeAQFBgSqjUDMObkpqupU7_P6uGMXPiCPZMwBdS_aZTdVhwFQMfpoVx7LSKpaoEKA7x_r7t3knAtW7APhODpk=w2400)](https://lh3.googleusercontent.com/TtIsnlRZNLT1oEbFV7WhmPZVnLpQYZgMt5k-wcknc8mi5M6gwqNoQaXoHId7K5xi_2H5LFlaSjy_LZkui0jVKhreMBl_x5bbtXdooG0lfQrtwYzUdt4wq8Ro-ozMQheVYOuYgOz8DJQ=w2400)
+[![Watch the video](https://lh3.googleusercontent.com/FaF4OsCMVmLWXKnugf77A7-u4ry_9ky7wxZ7Lnj43Nz5OHYJiJNrk4zeAQFBgSqjUDMObkpqupU7_P6uGMXPiCPZMwBdS_aZTdVhwFQMfpoVx7LSKpaoEKA7x_r7t3knAtW7APhODpk=w2400)](https://youtu.be/6WhPjRy67tg)
 ## How does the automated connection work?
 Unfortunately, the javascript application can see only the IP address and not the mac address, so I used Evilscan to search all the clients in the local network, and then I read the header to see whether or not is the webserver of the cash registry. In case of failure of this process the operator is able to insert the IP of the cash registry manually.
 ### Is safe the usage of this method?
