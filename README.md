@@ -8,7 +8,7 @@ With this server, you can control your Custom cash register present in the local
 * encryption of the communication between client and server
 * can run in less than 100 Mb of ram
 * authentication
-[![Video where I show a friends of mine my work]({image-url})]({https://lh3.googleusercontent.com/2Fz6Fn5zq_hh75oNLsyNqyGSHzPopHojN77Eu6GImw_3bb4JteONR_K8lnCY2nRbZQV9RD7ACVYvTHEEoW6oGt2GNkAVXzsGdHl1XI9JWwr9ojo3N7t5mYgqaux8lESdvi4mJTti4Ok=w2400} "Video where I show a friends of mine my work")
+![Video where I show a friends of mine my work]({https://lh3.googleusercontent.com/2Fz6Fn5zq_hh75oNLsyNqyGSHzPopHojN77Eu6GImw_3bb4JteONR_K8lnCY2nRbZQV9RD7ACVYvTHEEoW6oGt2GNkAVXzsGdHl1XI9JWwr9ojo3N7t5mYgqaux8lESdvi4mJTti4Ok=w2400} "Video where I show a friends of mine my work")
 ## How does the automated connection work?
 Unfortunately, the javascript application can see only the IP address and not the mac address, so I used Evilscan to search all the clients in the local network, and then I read the header to see whether or not is the webserver of the cash registry. In case of failure of this process the operator is able to insert the IP of the cash registry manually.
 ### Is safe the usage of this method?
